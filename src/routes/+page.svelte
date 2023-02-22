@@ -9,18 +9,36 @@
 	let modal = false;
 
 	const onInput = (e) => {
-		let lastAns = '';
+		let lastAnswer = '';
 		output = '';
+		const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+		let index = 0;
+		const dictionary = {};
 		for (let row of input.split('\n')) {
 			try {
 				if (['*', '/', '+', '-', '(', '^', '!'].includes(row[0])) {
 					row = 'ans' + row;
 				}
-				row = row.replace(/ans/g, lastAns).replace(/\$/g, '').replace(/,/g, '');
+				row = row
+					.replace(/ans/g, lastAnswer)
+					.replace(/\$/g, '')
+					.replace(/,/g, '')
+					// @ts-ignore
+					.replace(/[a-z]/gi, (key) => dictionary[key]);
 				const result = evaluate(row);
 				if (result !== undefined) {
-					output += result;
-					lastAns = `${result}`;
+					const letter = alphabet[index];
+					output += `<div class="outputRow">
+						<span class="outputTag">${letter}</span>
+						${result}
+						<span onClick="navigator.clipboard.writeText('${result}')" class="outputCopy">⧉</span>
+						</div>`;
+					lastAnswer = `${result}`;
+					index += 1;
+					// @ts-ignore
+					dictionary[letter] = result;
+				} else {
+					output += `<div style="height:35px"> </div>`;
 				}
 			} catch (err) {}
 			output += '\n';
@@ -28,9 +46,9 @@
 		output = output.slice(0, -1);
 	};
 
-	const onKeyDown = (e) => {
-		e.preventDefault();
-	};
+	// const onKeyDown = (e) => {
+	// 	e.preventDefault();
+	// };
 
 	const onKeyUp = (e) => {
 		if (['Escape', 'Esc'].includes(e.key)) {
@@ -42,7 +60,7 @@
 	onMount(() => {
 		setTimeout(() => {
 			document.querySelector('#input')?.focus();
-		}, 10);
+		}, 1);
 	});
 </script>
 
@@ -65,14 +83,9 @@
 		on:keyup={onKeyUp}
 		spellcheck="false"
 	/>
-	<textarea
-		placeholder=""
-		slot="right"
-		id="output"
-		bind:value={output}
-		on:keydown={onKeyDown}
-		spellcheck="false"
-	/>
+	<div placeholder="" slot="right" id="output" spellcheck="false">
+		{@html output}
+	</div>
 </SplitPane>
 {#if modal}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -197,10 +210,7 @@
 	textarea {
 		height: calc(100vh - 70px);
 	}
-	#input {
-	}
-	#output {
-	}
+
 	textarea {
 		resize: none;
 		outline: none;
@@ -217,5 +227,8 @@
 
 	#output {
 		background-color: #111;
+		height: calc(100vh - 33px);
+		padding-top: 33px;
+		padding-left: 20px;
 	}
 </style>
