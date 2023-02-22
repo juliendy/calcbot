@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { parser } from 'mathjs';
+	import { clickOutside } from '../scripts/clickOutside.js';
 	import SplitPane from '../components/SplitPlane.svelte';
 	import './styles.css';
 
