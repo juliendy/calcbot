@@ -1,9 +1,11 @@
 # calc.bot
 
-COMING SOON
+It’s a simple split-pane calculator that lets users enter expressions in human terms on the left-hand side and see live results on the right. 
+For example, you can assign variables (`Rent is $2,000` , `Months = 12`) and perform calculations using them (`AnnualRent = Rent * Months`). If you feel updating one variable, the rest of the expressions update in real time.
 
 ## preview
-![calc.bot]()
+Coming soon
+
 ### todos
 - [ ] add toolbar with file, edit, view and help menus
 - [ ] add % formatting, allow vars to be set on right of expression
@@ -13,7 +15,7 @@ COMING SOON
 - [x] add modal
 - [x] clearing on esc and disable spellcheck
 - [x] favicon icons for modal
-- [x] utilise mathjs / read ![docs](https://mathjs.org/docs/index.html)
+- [x] utilise mathjs / read [docs](https://mathjs.org/docs/index.html)
 - [x] assign results to alphabetical variables + add copy button
 
 ## setup project
