@@ -57,7 +57,7 @@
 </div>
 <SplitPane>
 	<textarea
-		placeholder="Start typing an expression"
+		placeholder=""
 		slot="left"
 		id="input"
 		bind:value={input}
@@ -66,7 +66,7 @@
 		spellcheck="false"
 	/>
 	<textarea
-		placeholder="See the results here"
+		placeholder=""
 		slot="right"
 		id="output"
 		bind:value={output}
@@ -88,33 +88,26 @@
 			<p>
 				<img id="modalLogo" alt="logo" src="/favicon.png" /> calc.bot made by
 				<a target="_blank" rel="noreferrer" href="https://juliendy.dev"
-					><img
-						alt="juliendydev"
-						class="thumbnail"
-						src="https://www.juliendy.dev/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fme.fd136dd3.jpg&w=1080&q=75"
-					/>juliendydev</a
+					><img alt="juliendydev" class="thumbnail" src="./image.webp" />juliendydev</a
 				>
 			</p>
 			<p>
 				Powered by <a target="_blank" rel="noreferrer" href="https://kit.svelte.dev"
-					><img
-						alt="SvelteKit"
-						class="thumbnail"
-						src="https://kit.svelte.dev/favicon.png"
-					/>SvelteKit</a
+					><img alt="SvelteKit" class="thumbnail" src="./sveltekit.png" />SvelteKit</a
 				>
 				&
 				<a target="_blank" rel="noreferrer" href="https://mathjs.org"
-					><img alt="MathJS" class="thumbnail" src="https://mathjs.org/favicon.ico" />MathJS</a
+					><img alt="MathJS" class="thumbnail" src="./mathjs.png" />MathJS</a
 				>
 			</p>
 			<p>
 				I was inspired by <a
 					target="_blank"
 					rel="noreferrer"
-					href="https://www.skytopia.com/software/opalcalc/">OpalCalc</a
+					href="https://www.skytopia.com/software/opalcalc/"
+					><img alt="OpalCalc" class="thumbnail" src="./opalcalc.png" />OpalCalc</a
 				> to make a lightweight split-pane calculator. Users can enter expressions in human terms on
-				the left (like a working document) and see live results on the right.
+				the left and see live results on the right.
 			</p>
 			<p>
 				Press <span>esc</span> to clear, type <span>ans</span> to use the last answer, and convert
@@ -169,7 +162,7 @@
 		align-items: center;
 	}
 	#innerModal {
-		width: 300px;
+		width: 350px;
 		height: 300px;
 		background-color: #111;
 		padding: 10px;
@@ -189,7 +182,7 @@
 	.thumbnail {
 		width: 20px;
 		height: 20px;
-		margin-right: 2px;
+		margin-right: 4px;
 		margin-bottom: -4px;
 		border-radius: 5px;
 	}
@@ -220,5 +213,9 @@
 		line-height: 1.5;
 		width: calc(100% - 40px);
 		height: calc(100vh - 70px);
+	}
+
+	#output {
+		background-color: #111;
 	}
 </style>
