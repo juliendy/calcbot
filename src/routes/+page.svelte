@@ -227,8 +227,8 @@
 
 	#output {
 		background-color: #111;
-		height: calc(100vh - 33px);
-		padding-top: 33px;
+		height: calc(100vh - 28px);
+		padding-top: 28px;
 		padding-left: 20px;
 	}
 </style>
