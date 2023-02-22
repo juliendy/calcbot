@@ -5,11 +5,11 @@ COMING SOON
 ## preview
 ![calc.bot]()
 ### todos
-- [ ] allow user to set variables and words for operation
 - [ ] add toolbar with file, edit, view and help menus
 - [ ] add % formatting, allow vars to be set on right of expression
 - [ ] add ability to open and save .calc files using local file system
 ### finished
+- [x] allow user to set variables and words for operation
 - [x] add modal
 - [x] clearing on esc and disable spellcheck
 - [x] favicon icons for modal

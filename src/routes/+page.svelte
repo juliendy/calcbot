@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { evaluate } from 'mathjs';
+	import { parser } from 'mathjs';
 	import SplitPane from '../components/SplitPlane.svelte';
 	import './styles.css';
 
@@ -9,11 +9,11 @@
 	let modal = false;
 
 	const onInput = (e) => {
+		const math = parser()
 		let lastAnswer = '';
 		output = '';
 		const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-		let index = 0;
-		const dictionary = {};
+		let alphabetIndex = 0
 		for (let row of input.split('\n')) {
 			try {
 				if (['*', '/', '+', '-', '(', '^', '!'].includes(row[0])) {
@@ -21,22 +21,21 @@
 				}
 				row = row
 					.replace(/ans/g, lastAnswer)
-					.replace(/\$/g, '')
-					.replace(/,/g, '')
-					// @ts-ignore
-					.replace(/[a-z]/gi, (key) => dictionary[key]);
-				const result = evaluate(row);
+					.replace(/ is | are /g, '=')
+					.replace(/ and | plus /g, '+')
+					.replace(/ minus | without /g, '-')
+					.replace(/\$|,/g, '');
+				const result = math.evaluate(row);
 				if (result !== undefined) {
-					const letter = alphabet[index];
-					output += `<div class="outputRow">
-						<span class="outputTag">${letter}</span>
-						${result}
-						<span onClick="navigator.clipboard.writeText('${result}')" class="outputCopy">⧉</span>
-						</div>`;
+					let key = alphabet[alphabetIndex];
+					if (row.includes('=')) {
+						key = row.split('=')[0];
+					} else {
+						math.set(key, result);
+						alphabetIndex += 1;
+					}
+					output += `<div class="outputRow"><span class="outputTag">${key}</span>${result}</div>`;
 					lastAnswer = `${result}`;
-					index += 1;
-					// @ts-ignore
-					dictionary[letter] = result;
 				} else {
 					output += `<div style="height:35px"> </div>`;
 				}
@@ -75,7 +74,6 @@
 </div>
 <SplitPane>
 	<textarea
-		placeholder=""
 		slot="left"
 		id="input"
 		bind:value={input}
@@ -83,7 +81,7 @@
 		on:keyup={onKeyUp}
 		spellcheck="false"
 	/>
-	<div placeholder="" slot="right" id="output" spellcheck="false">
+	<div slot="right" id="output" spellcheck="false">
 		{@html output}
 	</div>
 </SplitPane>
