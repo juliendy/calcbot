@@ -7,10 +7,10 @@ For example, you can assign variables (`Rent is $2,000` , `Months = 12`) and per
 Coming soon
 
 ### todos
-- [ ] add toolbar with file, edit, view and help menus
 - [ ] add % formatting, allow vars to be set on right of expression
 - [ ] add ability to open and save .calc files using local file system
 ### finished
+- [x] add toolbar with file, edit, view and help menus
 - [x] allow user to set variables and words for operation
 - [x] add modal
 - [x] clearing on esc and disable spellcheck
