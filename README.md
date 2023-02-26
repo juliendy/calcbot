@@ -7,8 +7,9 @@ For example, you can assign variables (`Rent is $2,000` , `Months = 12`) and per
 Coming soon
 
 ### todos
-- [ ] add % formatting, allow vars to be set on right of expression
 - [ ] add ability to open and save .calc files using local file system
+- [ ] ability to restore most recent file on load using IndexedDB + added shortcuts
+- [ ] preventing exit without saving changes
 ### finished
 - [x] add toolbar with file, edit, view and help menus
 - [x] allow user to set variables and words for operation
@@ -17,6 +18,7 @@ Coming soon
 - [x] favicon icons for modal
 - [x] utilise mathjs / read [docs](https://mathjs.org/docs/index.html)
 - [x] assign results to alphabetical variables + add copy button
+- [x] add eur/% formatting, allow vars to be set on right of expression
 
 ## setup project
 
