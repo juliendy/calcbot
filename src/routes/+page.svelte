@@ -10,38 +10,78 @@
 	let modal = '';
 	let menu = '';
 
+	const currencyFormatter = new Intl.NumberFormat('de-DE', {
+		style: 'currency',
+		currency: 'EUR',
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2
+	});
+	const percentageFormatter = new Intl.NumberFormat('de-DE', {
+		style: 'percent',
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2
+	});
+
 	const onInput = (e) => {
 		const math = parser();
 		let lastAnswer = '';
 		output = '';
-		const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-		let alphabetIndex = 0;
+		let formatDictionary = {};
 		for (let row of input.split('\n')) {
+			if (['*', '/', '+', '-'].includes(row[0])) {
+				row = 'ans' + row;
+			}
+			let formatAs = '';
+			if (
+				row.includes('$') ||
+				Object.entries(formatDictionary).filter(
+					([key, value]) => value === 'currency' && ` ${row} `.includes(key)
+				).length
+			) {
+				formatAs = 'currency';
+			} else if (
+				row.includes('%') ||
+				Object.entries(formatDictionary).filter(
+					([key, value]) => value === 'percent' && ` ${row} `.includes(key)
+				).length
+			) {
+				formatAs = 'percent';
+			}
+			row = row
+				.replace(/ans/g, lastAnswer)
+				.replace(/ is | are /g, '=')
+				.replace(/ and | plus /g, '+')
+				.replace(/ minus | without /g, '-')
+				.replace(/\$|,/g, '');
+			let key;
+			if (row.includes('=')) {
+				const splitRow = row.split('=');
+				try {
+					math.evaluate(row);
+					key = splitRow[0];
+				} catch (err) {
+					key = splitRow[1];
+					row = `${splitRow[1]} = ${splitRow[0]}`;
+				}
+				// @ts-ignore
+				formatDictionary[key] = formatAs;
+			}
+			let result;
 			try {
-				if (['*', '/', '+', '-', '(', '^', '!'].includes(row[0])) {
-					row = 'ans' + row;
-				}
-				row = row
-					.replace(/ans/g, lastAnswer)
-					.replace(/ is | are /g, '=')
-					.replace(/ and | plus /g, '+')
-					.replace(/ minus | without /g, '-')
-					.replace(/\$|,/g, '');
-				const result = math.evaluate(row);
-				if (result !== undefined) {
-					let key = alphabet[alphabetIndex];
-					if (row.includes('=')) {
-						key = row.split('=')[0];
-					} else {
-						math.set(key, result);
-						alphabetIndex += 1;
-					}
-					output += `<div class="outputRow"><span class="outputTag">${key}</span>${result}</div>`;
-					lastAnswer = `${result}`;
-				} else {
-					output += `<div style="height:35px"> </div>`;
-				}
+				result = math.evaluate(row);
 			} catch (err) {}
+			if (result !== undefined && !`${result}`.includes('return fn')) {
+				output += `<div class="outputRow">${key ? `<span class="outputTag">${key}</span>` : ''}${
+					formatAs === 'currency'
+						? currencyFormatter.format(result)
+						: formatAs === 'percent'
+						? percentageFormatter.format(result)
+						: result
+				}</div>`;
+				lastAnswer = `${result}`;
+			} else {
+				output += `<div style="height:35px"> </div>`;
+			}
 			output += '\n';
 		}
 		output = output.slice(0, -1);
@@ -73,7 +113,7 @@
 		}}
 		><img id="logo" alt="logo" src="/favicon.png" /> calc.bot
 	</button>
-		<span class="headerDivider">•</span>
+	<span class="headerDivider">•</span>
 	<div class="toolbarContainer">
 		<button
 			class="toolbarButton"
@@ -96,7 +136,7 @@
 			>
 				<button
 					class="menuButton"
-					on:click={() => {
+					on:click={async() => {
 						menu = '';
 						input = '';
 						output = '';
@@ -119,7 +159,6 @@
 					class="menuButton"
 					on:click={() => {
 						menu = '';
-						modal = 'save';
 					}}>Save as</button
 				>
 				<button
@@ -173,7 +212,7 @@
 			</div>
 		{/if}
 	</div>
-	
+
 	<div class="toolbarContainer">
 		<button
 			class="toolbarButton"
@@ -254,7 +293,7 @@
 	</div>
 </SplitPane>
 {#if modal}
-<div id="outerModal">
+	<div id="outerModal">
 		<div
 			id="innerModal"
 			use:clickOutside
@@ -264,13 +303,13 @@
 		>
 			{#if modal === 'about'}
 				<p>
-					<img id="modalLogo" alt="logo" src="/favicon.png" /> calc.bot made by
-					<a target="_blank" rel="noreferrer" href="https://htic.io"
+					<img id="modalLogo" alt="logo" src="./favicon.png" /> calc.bot made by
+					<a target="_blank" rel="noreferrer" href="https://juliendy.dev"
 						><img
-							alt="heythisischris"
+							alt="juliendy"
 							class="thumbnail"
-							src="./heythisischris.png"
-						/>heythisischris</a
+							src="./image.webp"
+						/>juliendy</a
 					>
 				</p>
 				<p>
@@ -297,20 +336,6 @@
 					<span>centimeters</span>
 					to <span>inches</span>.
 				</p>
-				<p>
-					Like what you see? <a
-						target="_blank"
-						rel="noreferrer"
-						href="https://donate.stripe.com/4gw7tI7gIc380jC7ss"
-						><img alt="Stripe" class="thumbnail" src="./stripe.png" />Donate here</a
-					>!
-				</p>
-			{/if}
-			{#if modal === 'open'}
-				Open
-			{/if}
-			{#if modal === 'save'}
-				Save
 			{/if}
 		</div>
 	</div>
@@ -321,12 +346,10 @@
 		color: #666;
 	}
 	.menuContainer {
-		min-width: 75px;
-		padding: 10px;
-		background-color: #222;
+		min-width: 90px;
+		background-color: #111;
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
 	}
 	.toolbarContainer {
 		display: flex;
@@ -335,14 +358,19 @@
 	.toolbarButton,
 	.menuButton {
 		all: unset;
-		padding: 0px 5px;
+		margin: 5px;
+		opacity: 0.5;
+		transition: opacity 0.01s;
 	}
 	.toolbarButton {
-		margin-bottom: 2px;
+		margin-top: 0px;
+	}
+	.menuButton {
+		margin: 5px 10px;
 	}
 	.toolbarButton:hover,
 	.menuButton:hover {
-		text-decoration-line: underline;
+		opacity: 1;
 	}
 	.menuContainer {
 		display: flex;
