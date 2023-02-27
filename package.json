@@ -30,6 +30,7 @@
 	"type": "module",
 	"dependencies": {
 		"@sveltejs/adapter-static": "^1.0.0",
+		"idb-keyval": "^6.2.0",
 		"mathjs": "^11.5.1"
 	}
 }
