@@ -52,7 +52,7 @@
 				.replace(/ is | are /g, '=')
 				.replace(/ and | plus /g, '+')
 				.replace(/ minus | without /g, '-')
-				.replace(/\$|,/g, '');
+				.replace(/\$|,|;/g, '');
 			let key;
 			if (row.includes('=')) {
 				const splitRow = row.split('=');
@@ -61,7 +61,11 @@
 					key = splitRow[0];
 				} catch (err) {
 					key = splitRow[1];
-					row = `${splitRow[1]} = ${splitRow[0]}`;
+					if (key) {
+						row = `${splitRow[1]} = ${splitRow[0]}`;
+					} else {
+						row = splitRow[0];
+					}
 				}
 				// @ts-ignore
 				formatDictionary[key] = formatAs;
@@ -136,7 +140,7 @@
 			>
 				<button
 					class="menuButton"
-					on:click={async() => {
+					on:click={async () => {
 						menu = '';
 						input = '';
 						output = '';
@@ -144,9 +148,25 @@
 				>
 				<button
 					class="menuButton"
-					on:click={() => {
+					on:click={async () => {
 						menu = '';
-						modal = 'open';
+						let fileHandle;
+						[fileHandle] = await window.showOpenFilePicker({
+							types: [
+								{
+									description: 'Calculations',
+									accept: {
+										'text/calc': ['.calc']
+									}
+								}
+							],
+							excludeAcceptAllOption: true,
+							multiple: false
+						});
+						const file = await fileHandle.getFile();
+						input = await file.text();
+						onInput();
+						document.querySelector('#input')?.focus();
 					}}>Open</button
 				>
 				<button
@@ -157,15 +177,28 @@
 				>
 				<button
 					class="menuButton"
-					on:click={() => {
+					on:click={async () => {
 						menu = '';
+						const newHandle = await window.showSaveFilePicker({
+							types: [
+								{
+									description: 'Calculation',
+									accept: {
+										'text/calc': ['.calc']
+									}
+								}
+							]
+						});
+						const writableStream = await newHandle.createWritable();
+						await writableStream.write(input);
+						await writableStream.close();
+						document.querySelector('#input')?.focus();
 					}}>Save as</button
 				>
 				<button
 					class="menuButton"
 					on:click={() => {
 						menu = '';
-						modal = 'share';
 					}}>Share</button
 				>
 			</div>
@@ -305,11 +338,7 @@
 				<p>
 					<img id="modalLogo" alt="logo" src="./favicon.png" /> calc.bot made by
 					<a target="_blank" rel="noreferrer" href="https://juliendy.dev"
-						><img
-							alt="juliendy"
-							class="thumbnail"
-							src="./image.webp"
-						/>juliendy</a
+						><img alt="juliendy" class="thumbnail" src="./image.webp" />juliendy</a
 					>
 				</p>
 				<p>
@@ -451,6 +480,7 @@
 		display: flex;
 		flex-direction: row;
 		gap: 10px;
+		width: calc(100% - 20px);
 	}
 	textarea {
 		height: calc(100vh - 70px);
