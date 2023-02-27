@@ -7,8 +7,7 @@ For example, you can assign variables (`Rent is €2,000` , `Months = 12`) and p
 Coming soon
 
 ### todos
-- [ ] ability to restore most recent file on load using IndexedDB + added shortcuts ([ibdkeyval](https://github.com/jakearchibald/idb-keyval))
-- [ ] preventing exit without saving changes
+- [ ] work further on ability to change font + theme in menu.
 ### finished
 - [x] add toolbar with file, edit, view and help menus
 - [x] allow user to set variables and words for operation
@@ -19,6 +18,8 @@ Coming soon
 - [x] assign results to alphabetical variables + add copy button
 - [x] add eur/% formatting, allow vars to be set on right of expression
 - [x] add ability to open and save .calc files using local file system
+- [x] ability to restore most recent file on load using IndexedDB + added shortcuts ([ibdkeyval](https://github.com/jakearchibald/idb-keyval))
+- [x] preventing exit without saving changes
 
 ## tech
 + sveltekit

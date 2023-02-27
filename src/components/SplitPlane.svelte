@@ -1,5 +1,5 @@
 <script>
-	export let leftInitialSize = '66%';
+	export let leftInitialSize = '20%';
 	let left;
 	let isDragging = false;
 	function dragstart() {

@@ -364,7 +364,7 @@
 		{/if}
 	</div>
 	{#if unsaved}
-		<div id="unsaved">unsaved</div>
+		<div id="unsaved"><span>•</span>unsaved</div>
 	{/if}
 </div>
 <SplitPane>
@@ -436,11 +436,19 @@
 		padding: 0px 5px;
 		height: 16px;
 	}
+
+	#unsaved span {
+		margin-right: 2px;
+		color: #ff8800;
+		font-weight: 800;
+	}
 	.menuContainer {
 		min-width: 90px;
 		background-color: #111;
 		display: flex;
 		flex-direction: column;
+		border: 1px solid #666;
+		border-radius: 5px;
 	}
 	.toolbarContainer {
 		display: flex;
