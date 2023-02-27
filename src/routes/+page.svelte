@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { parser } from 'mathjs';
+	import { get, set } from 'idb-keyval';
 	import { clickOutside } from '../scripts/clickOutside.js';
 	import SplitPane from '../components/SplitPlane.svelte';
 	import './styles.css';
@@ -9,6 +10,8 @@
 	let input = '';
 	let modal = '';
 	let menu = '';
+	let fileHandle;
+	let unsaved = false;
 
 	const currencyFormatter = new Intl.NumberFormat('de-DE', {
 		style: 'currency',
@@ -74,7 +77,7 @@
 			try {
 				result = math.evaluate(row);
 			} catch (err) {}
-			if (result !== undefined && !`${result}`.includes('return fn')) {
+			if (result !== undefined && !`${result}`.includes('.apply(')) {
 				output += `<div class="outputRow">${key ? `<span class="outputTag">${key}</span>` : ''}${
 					formatAs === 'currency'
 						? currencyFormatter.format(result)
@@ -89,35 +92,114 @@
 			output += '\n';
 		}
 		output = output.slice(0, -1);
+		unsaved = true;
 	};
 
 	// const onKeyDown = (e) => {
 	// 	e.preventDefault();
 	// };
 
-	const onKeyUp = (e) => {
-		if (['Escape', 'Esc'].includes(e.key)) {
-			input = '';
-			output = '';
+	const newFile = async () => {
+		menu = '';
+		input = '';
+		output = '';
+		document.title = 'calc.bot';
+		fileHandle = null;
+		await set('fileHandle', undefined);
+		await set('file', undefined);
+		unsaved = false;
+	};
+	const openFile = async () => {
+		menu = '';
+		[fileHandle] = await window.showOpenFilePicker({
+			types: [
+				{
+					description: 'Calculations',
+					accept: {
+						'text/calc': ['.calc']
+					}
+				}
+			],
+			excludeAcceptAllOption: true,
+			multiple: false
+		});
+		await set('fileHandle', fileHandle);
+		document.title = fileHandle.name;
+		input = await (await fileHandle.getFile()).text();
+		await set('file', input);
+		onInput();
+		document.querySelector('#input')?.focus();
+		unsaved = false;
+	};
+	const saveAsFile = async () => {
+		menu = '';
+		fileHandle = await window.showSaveFilePicker({
+			types: [
+				{
+					description: 'Calculation',
+					accept: {
+						'text/calc': ['.calc']
+					}
+				}
+			]
+		});
+		await set('fileHandle', fileHandle);
+		document.title = fileHandle.name;
+		const writableStream = await fileHandle.createWritable();
+		await writableStream.write(input);
+		await writableStream.close();
+		document.querySelector('#input')?.focus();
+		unsaved = false;
+	};
+	const saveFile = async () => {
+		if (fileHandle) {
+			const writableStream = await fileHandle.createWritable();
+			await set('fileHandle', fileHandle);
+			await set('file', input);
+			await writableStream.write(input);
+			await writableStream.close();
+			document.querySelector('#input')?.focus();
+			unsaved = false;
+		} else {
+			saveAsFile();
+		}
+	};
+	const onKeyDown = async (e) => {
+		if (['Escape', 'Esc'].includes(e.key) || (e.ctrlKey && e.key === 'n')) {
+			e.preventDefault();
+			newFile();
+		} else if (e.ctrlKey && e.key === 's') {
+			e.preventDefault();
+			saveFile();
+		} else if (e.ctrlKey && e.key === 'o') {
+			e.preventDefault();
+			openFile();
 		}
 	};
 
 	onMount(() => {
-		setTimeout(() => {
+		setTimeout(async () => {
+			fileHandle = await get('fileHandle');
+			if (fileHandle) {
+				document.title = fileHandle.name;
+				input = await get('file');
+				onInput();
+				unsaved = false;
+			}
 			document.querySelector('#input')?.focus();
 		}, 1);
 	});
 </script>
 
 <div id="header">
-	<button
+	<!-- <button
 		id="infoButton"
 		on:click={() => {
 			modal = modal ? '' : 'about';
 		}}
 		><img id="logo" alt="logo" src="/favicon.png" /> calc.bot
 	</button>
-	<span class="headerDivider">•</span>
+	<span class="headerDivider">•</span> -->
 	<div class="toolbarContainer">
 		<button
 			class="toolbarButton"
@@ -144,55 +226,25 @@
 						menu = '';
 						input = '';
 						output = '';
+						newFile();
 					}}>New</button
 				>
 				<button
 					class="menuButton"
 					on:click={async () => {
-						menu = '';
-						let fileHandle;
-						[fileHandle] = await window.showOpenFilePicker({
-							types: [
-								{
-									description: 'Calculations',
-									accept: {
-										'text/calc': ['.calc']
-									}
-								}
-							],
-							excludeAcceptAllOption: true,
-							multiple: false
-						});
-						const file = await fileHandle.getFile();
-						input = await file.text();
-						onInput();
-						document.querySelector('#input')?.focus();
+						open();
 					}}>Open</button
 				>
 				<button
 					class="menuButton"
 					on:click={() => {
-						menu = '';
+						saveFile();
 					}}>Save</button
 				>
 				<button
 					class="menuButton"
 					on:click={async () => {
-						menu = '';
-						const newHandle = await window.showSaveFilePicker({
-							types: [
-								{
-									description: 'Calculation',
-									accept: {
-										'text/calc': ['.calc']
-									}
-								}
-							]
-						});
-						const writableStream = await newHandle.createWritable();
-						await writableStream.write(input);
-						await writableStream.close();
-						document.querySelector('#input')?.focus();
+						saveAsFile();
 					}}>Save as</button
 				>
 				<button
@@ -311,6 +363,9 @@
 			</div>
 		{/if}
 	</div>
+	{#if unsaved}
+		<div id="unsaved">unsaved</div>
+	{/if}
 </div>
 <SplitPane>
 	<textarea
@@ -318,7 +373,7 @@
 		id="input"
 		bind:value={input}
 		on:input={onInput}
-		on:keyup={onKeyUp}
+		on:keyup={onKeyDown}
 		spellcheck="false"
 	/>
 	<div slot="right" id="output" spellcheck="false">
@@ -371,8 +426,15 @@
 {/if}
 
 <style>
-	.headerDivider {
-		color: #666;
+	#unsaved {
+		display: flex;
+		font-size: 9px;
+		background-color: #333;
+		justify-content: center;
+		align-items: center;
+		border-radius: 10px;
+		padding: 0px 5px;
+		height: 16px;
 	}
 	.menuContainer {
 		min-width: 90px;
@@ -407,12 +469,6 @@
 		position: absolute;
 		top: 20px;
 	}
-	#logo {
-		width: 18px;
-		height: 18px;
-		margin-top: -1px;
-		margin-right: 1px;
-	}
 	#modalLogo {
 		width: 18px;
 		height: 18px;
@@ -421,17 +477,6 @@
 	}
 	a {
 		color: #fff;
-	}
-	#infoButton {
-		all: unset;
-		cursor: pointer;
-		transition: opacity 0.1s;
-		display: flex;
-		opacity: 0.5;
-		height: 10px;
-	}
-	#infoButton:hover {
-		opacity: 1;
 	}
 	#outerModal {
 		position: absolute;
