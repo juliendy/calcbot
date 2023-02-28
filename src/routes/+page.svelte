@@ -192,14 +192,6 @@
 </script>
 
 <div id="header">
-	<!-- <button
-		id="infoButton"
-		on:click={() => {
-			modal = modal ? '' : 'about';
-		}}
-		><img id="logo" alt="logo" src="/favicon.png" /> calc.bot
-	</button>
-	<span class="headerDivider">•</span> -->
 	<div class="toolbarContainer">
 		<button
 			class="toolbarButton"
@@ -222,24 +214,21 @@
 			>
 				<button
 					class="menuButton"
-					on:click={async () => {
-						menu = '';
-						input = '';
-						output = '';
+					on:click={() => {
 						newFile();
-					}}>New</button
+					}}>New <span class="menuShortcut">Ctrl+N</span></button
 				>
 				<button
 					class="menuButton"
 					on:click={async () => {
-						open();
-					}}>Open</button
+						openFile();
+					}}>Open <span class="menuShortcut">Ctrl+O</span></button
 				>
 				<button
 					class="menuButton"
 					on:click={() => {
 						saveFile();
-					}}>Save</button
+					}}>Save <span class="menuShortcut">Ctrl+S</span></button
 				>
 				<button
 					class="menuButton"
@@ -280,24 +269,23 @@
 					class="menuButton"
 					on:click={() => {
 						menu = '';
-					}}>Cut</button
+					}}>Cut <span class="menuShortcut">Ctrl-X</span></button
 				>
 				<button
 					class="menuButton"
 					on:click={() => {
 						menu = '';
-					}}>Copy</button
+					}}>Copy <span class="menuShortcut">Ctrl-C</span></button
 				>
 				<button
 					class="menuButton"
 					on:click={() => {
 						menu = '';
-					}}>Paste</button
+					}}>Paste <span class="menuShortcut">Ctrl-V</span></button
 				>
 			</div>
 		{/if}
 	</div>
-
 	<div class="toolbarContainer">
 		<button
 			class="toolbarButton"
@@ -426,6 +414,12 @@
 {/if}
 
 <style>
+	.menuShortcut {
+		font-size: 8px;
+		color: #aaa;
+		float: right;
+		margin-top: 4px;
+	}
 	#unsaved {
 		display: flex;
 		font-size: 9px;
