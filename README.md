@@ -4,7 +4,7 @@ It’s a simple split-pane calculator that lets users enter expressions in human
 For example, you can assign variables (`Rent is €2,000` , `Months = 12`) and perform calculations using them (`AnnualRent = Rent * Months`). If you feel updating one variable, the rest of the expressions update in real time.
 
 ## preview
-Coming soon
+[calc.bot](https://calc-bot.netlify.app/)
 
 ### todos
 - [ ] work further on ability to change font + theme in menu.
