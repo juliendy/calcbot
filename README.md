@@ -8,6 +8,7 @@ For example, you can assign variables (`Rent is €2,000` , `Months = 12`) and p
 
 ### todos
 - [ ] work further on ability to change font + theme in menu.
+- [ ] responsive + accessible design (focus on smaller screens)
 ### finished
 - [x] add toolbar with file, edit, view and help menus
 - [x] allow user to set variables and words for operation
